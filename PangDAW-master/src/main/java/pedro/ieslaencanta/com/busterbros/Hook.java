@@ -22,8 +22,16 @@ public class Hook extends ElementResizable {
         gc.setFill(Color.GREY);
         //se tendrá que sustituro por img
 
-        gc.fillRect( this.rectangle.getMinX(),this.rectangle.getMinY()* Game.SCALE,
+        gc.fillRect( this.rectangle.getMinX(),this.rectangle.getMinY()-10* Game.SCALE,
                 this.rectangle.getWidth()* Game.SCALE,this.rectangle.getHeight()* Game.SCALE);
 
+    }
+    @Override
+    public void setDefaultIncHeight(double inch) {
+        inch=this.ih;
+
+    }
+    public void pararDisparo(){
+        this.ih=0;
     }
 }

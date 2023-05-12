@@ -11,15 +11,13 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 
-import static javafx.scene.input.KeyCode.G;
-import static javafx.scene.input.KeyCode.UP;
-
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import pedro.ieslaencanta.com.busterbros.basic.*;
 import pedro.ieslaencanta.com.busterbros.basic.interfaces.IMovable;
 
+import static javafx.scene.input.KeyCode.*;
 import static pedro.ieslaencanta.com.busterbros.basic.interfaces.IMovable.BorderColision.DOWN;
 import static pedro.ieslaencanta.com.busterbros.basic.interfaces.IMovable.BorderColision.LEFT;
 import static pedro.ieslaencanta.com.busterbros.basic.interfaces.IMovable.BorderColision.RIGHT;
@@ -181,6 +179,7 @@ public class Board implements IKeyListener {
     public void setDebug() {
         this.debug = !this.debug;
         this.jugador.setDebug(debug);
+        this.hook.setDebug(debug);
         for (int i = 0; i < this.elements.length; i++) {
             this.elements[i].setDebug(debug);
         }
@@ -273,9 +272,12 @@ public class Board implements IKeyListener {
                 //this.detectColisionWithBricks(this.balls.getBall(i));
             }
         }
-        if(si==true ){
-            this.hook.resizeHeigth();
+        if ( si==true ){
+                this.hook.resizeHeigth();
         }
+
+
+
         this.crossbow.update();
 
 
@@ -433,12 +435,17 @@ public class Board implements IKeyListener {
                     this.balls.addBall(b[1]);
 
                 }
-
+                    break;
             case G:
                 this.hook= new Hook(0, 4);
                 this.hook.shoot();
+                this.hook.setPosition(this.hook.getCenter().getX()+0,this.hook.getCenter().getY()+4);
                 si=true;
+                break;
+            case J:
+                this.hook.pararDisparo();
                 }
+
 
 
 

@@ -31,6 +31,7 @@ public class ElementResizable extends ElementDynamic implements IResizable {
     public void resizeHeigth() {
     this.rectangle= new Rectangle2D(this.rectangle.getMinX(),this.rectangle.getMinY()-this.ih,
             this.rectangle.getWidth(),this.rectangle.getHeight()+this.ih);
+
     }
 
     @Override
@@ -45,6 +46,7 @@ public class ElementResizable extends ElementDynamic implements IResizable {
 
     @Override
     public void setDefaultIncHeight(double inch) {
+       inch=this.ih;
 
     }
 }
