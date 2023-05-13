@@ -286,23 +286,34 @@ public class Board implements IKeyListener {
                     this.balls.addBall(b[1]);
 
                 }
+                if (this.jugador.getRectangle().intersects(this.balls.getBall(i).getRectangle())) {
+                    vidas--;
+                    if(vidas<1){
+                        PararJuego();
+                    }
+                }
+                if (si == true) {
+                    this.hook.resizeHeigth();
+                    if (this.hook.getHeight() <= 8) {
+                        this.hook.pararDisparo();
+                    }
+                }
+                }
             }
-        }
-        if (si == true) {
-            this.hook.resizeHeigth();
-            if (this.hook.getHeight() <= 8) {
-                this.hook.pararDisparo();
-            }
-        }
-
-
-
-
-
         this.crossbow.update();
+        }
+
+
+
+
+
+
+
+
+
 
 //this.evalBorder(jugador);
-    }
+
 
     private void evalCollisions() {
 
@@ -478,7 +489,6 @@ public class Board implements IKeyListener {
                 si=true;
                 break;
             case J:
-                vidas--;
                 this.hook.pararDisparo();
                 if(vidas<1){
                 PararJuego();
