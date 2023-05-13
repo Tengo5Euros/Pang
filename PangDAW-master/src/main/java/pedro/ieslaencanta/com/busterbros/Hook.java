@@ -7,6 +7,7 @@ import pedro.ieslaencanta.com.busterbros.basic.ElementWithGravity;
 
 public class Hook extends ElementResizable {
      boolean disparo= false;
+     public static int Total_Incrementado;
     public Hook (){
         super();
     }
@@ -15,22 +16,18 @@ public class Hook extends ElementResizable {
 
     }
     public double shoot(){
+    Total_Incrementado= (int) (Total_Incrementado+ih+2);
         return ih+2;
 
     }
-    public void paint(GraphicsContext gc) {
+
+    public void paint(GraphicsContext gc, ElementWithGravity jugador) {
         gc.setFill(Color.GREY);
         //se tendrá que sustituro por img
-
-        gc.fillRect( this.rectangle.getMinX(),this.rectangle.getMinY()-10* Game.SCALE,
-                this.rectangle.getWidth()* Game.SCALE,this.rectangle.getHeight()* Game.SCALE);
+        gc.fillRect( jugador.getCenter().getX() * Game.SCALE, jugador.getCenter().getY() * Game.SCALE, 15 * Game.SCALE, 20 * Game.SCALE);
 
     }
-    @Override
-    public void setDefaultIncHeight(double inch) {
-        inch=this.ih;
 
-    }
     public void pararDisparo(){
         this.ih=0;
     }

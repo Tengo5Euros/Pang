@@ -53,6 +53,7 @@ public class Board implements IKeyListener {
     private Crossbow crossbow;
     private Hook hook;
     private boolean si=false;
+    private int vidas=1;
     public Board(Dimension2D original) {
         this.gc = null;
         this.game_zone = new Rectangle2D(8, 8, 368, 192);
@@ -69,28 +70,35 @@ public class Board implements IKeyListener {
         this.createLevels();
         this.nextLevel();
 
-        this.jugador = new ElementWithGravity(0, 2, false, true, 2, 2, 50, 50, 32, 32);
-        //this.ball = new ElementWithGravity(0,0.3,true,true,2,2,20,20,10,10);
-        this.balls = new Balls(50);
-        this.balls.addBall(new Ball(0, 0.3, true, true, 2, 2, 20, 20, 10, 10));
-        this.balls.addBall(new Ball(0, 0.3, true, true, 2, 2, 70, 70, 10, 10));
+        this.jugador = new ElementWithGravity(0, 2, false, true, 2, 2, this.game_zone.getMaxX()/2, this.game_zone.getMaxY()-32, 32, 32);
+
+        this.balls = new Balls(4);
+        this.balls.addBall(new Ball(0, 0.03, true, true, 0.3, 0.3, 20, 20, BallType.BIG.getWidth(), BallType.BIG.getHeight(),BallType.BIG));
+        this.balls.addBall(new Ball(0, 0.03, true, true, 0.3, 0.3, 70, 70, BallType.BIG.getWidth(), BallType.BIG.getHeight(), BallType.BIG));
         this.crossbow = new Crossbow(20, 70, 10, 10);
         this.hook = new Hook(0, 4);
 
-
     }
 
-    private void detectColisionWithBricks() {
-        for (int i = 0; i < this.balls.getSize(); i++) {
-            if (this.balls.getBall(i) != null) {
-                for (int j = 0; j < this.elements.length; j++) {
-                    if (this.elements[j] != null) {
+    private void detectColisionWithBricks(){
+        for (int i=0; i<this.balls.getSize();i++){
+            if(this.balls.getBall(i) != null){
+                for(int j=0; j<this.elements.length;j++){
+                    if(this.elements[j] != null && this.elements[j] instanceof Brick){
+                        //if(this.elements[j] instanceof Brick || this.elements[j] instanceof BricBreakable){
                         Optional<Colision> oc = this.balls.getBall(i).collision(this.elements[j]);
-                        if (oc.isPresent()) {
-                            this.balls.getBall(i).stop();
+                        if(oc.isPresent()){
+                            // this.balls.getBall(i).stop();
+                            this.balls.getBall(i).move(oc.get().getSeparator().getX(), oc.get().getSeparator().getY());
+                            if(oc.get().getSeparator().getX() != 0){
+                                this.balls.getBall(i).setVx(-this.balls.getBall(i).getVx());
+                            }
+                            if(oc.get().getSeparator().getY() != 0){
+                                this.balls.getBall(i).setVy(-this.balls.getBall(i).getVy());
+                            }
                         }
+                        // }
                     }
-
                 }
             }
         }
@@ -269,17 +277,29 @@ public class Board implements IKeyListener {
             if (this.balls.getBall(i) != null) {
                 this.balls.getBall(i).move();
                 this.evalBorder(this.balls.getBall(i));
-                //this.detectColisionWithBricks(this.balls.getBall(i));
+                this.detectColisionWithBricks();
+                System.out.println(this.hook.getCenterY());
+                if (this.hook.getRectangle().intersects(this.balls.getBall(i).getRectangle())) {
+                    Ball[] b = this.balls.getBall(i).explotar();
+                    this.balls.removeBall(this.balls.getBall(i));
+                    this.balls.addBall(b[0]);
+                    this.balls.addBall(b[1]);
+
+                }
             }
         }
-        if ( si==true ){
-                this.hook.resizeHeigth();
+        if (si == true) {
+            this.hook.resizeHeigth();
+            if (this.hook.getHeight() <= 8) {
+                this.hook.pararDisparo();
+            }
         }
+
+
 
 
 
         this.crossbow.update();
-
 
 //this.evalBorder(jugador);
     }
@@ -299,12 +319,23 @@ public class Board implements IKeyListener {
         this.jugador.paint(gc);
         this.crossbow.paint(gc, this.jugador);
         this.jugador.setColor(Color.GOLD);
-        this.hook.paint(gc);
+        if(this.hook.isInBorder(game_zone) != IMovable.BorderColision.TOP){
+            this.hook.paint(gc);
+        }
         // this.ball.paint(gc);
         // this.ball.setColor(Color.CORAL);
         for (int i = 0; i < this.balls.getSize(); i++) {
             if (this.balls.getBall(i) != null)
                 this.balls.getBall(i).paint(gc);
+        }
+
+    }
+    public void PararJuego(){
+        this.jugador.setPosition(-140,-140);
+        this.hook.setPosition(-140,-140);
+        for (int i = 0; i < this.balls.getSize(); i++) {
+            if (this.balls.getBall(i) != null)
+                this.balls.getBall(i).setPosition(-10000,-100000);
         }
     }
 
@@ -394,6 +425,7 @@ public class Board implements IKeyListener {
         }
     }
 
+
     @Override
     public void onKeyReleased(KeyCode code) {
 
@@ -439,11 +471,18 @@ public class Board implements IKeyListener {
             case G:
                 this.hook= new Hook(0, 4);
                 this.hook.shoot();
-                this.hook.setPosition(this.hook.getCenter().getX()+0,this.hook.getCenter().getY()+4);
+
+                this.hook.setPosition(this.jugador.getCenter().getX(),this.jugador.getCenter().getY()+10);
+                System.out.println(this.hook.Total_Incrementado+ this.hook.getHeight());
+
                 si=true;
                 break;
             case J:
+                vidas--;
                 this.hook.pararDisparo();
+                if(vidas<1){
+                PararJuego();
+                }
                 }
 
 

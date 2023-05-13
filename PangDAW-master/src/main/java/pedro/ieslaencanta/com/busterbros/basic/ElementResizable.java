@@ -1,6 +1,7 @@
 package pedro.ieslaencanta.com.busterbros.basic;
 
 import javafx.geometry.Rectangle2D;
+import pedro.ieslaencanta.com.busterbros.basic.interfaces.IMovable;
 import pedro.ieslaencanta.com.busterbros.basic.interfaces.IResizable;
 
 public class ElementResizable extends ElementDynamic implements IResizable {
@@ -48,5 +49,21 @@ public class ElementResizable extends ElementDynamic implements IResizable {
     public void setDefaultIncHeight(double inch) {
        inch=this.ih;
 
+    }
+    public IMovable.BorderColision isInBorder(Rectangle2D border) {
+        IMovable.BorderColision colision = IMovable.BorderColision.NONE;
+        if(this.rectangle.getMinY()< border.getMinY()){
+            colision = IMovable.BorderColision.TOP;
+        }else
+        if(this.rectangle.getMaxY()> border.getMaxY()){
+            colision = IMovable.BorderColision.DOWN;
+        }
+        if(this.rectangle.getMinX()<border.getMinX()){
+            colision = IMovable.BorderColision.LEFT;
+        }else
+        if(this.rectangle.getMaxX()>border.getMaxX()){
+            colision = IMovable.BorderColision.RIGHT;
+        }
+        return colision;
     }
 }
