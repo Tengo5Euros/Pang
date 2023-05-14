@@ -13,7 +13,7 @@ public class Ball extends ElementWithGravity {
     private BallType balltype;
     public Ball( double gx, double gy, boolean activegravityyx, boolean activegravityyy, double vx, double vy, double x, double y, double width, double height, BallType balltype) {
         super(gx, gy, activegravityyx, activegravityyy, vx, vy, x, y, width, height);
-        this.balltype= balltype;
+        this.setBalltype(balltype);
         this.originalvy = vy;
     }
 
@@ -78,4 +78,11 @@ public class Ball extends ElementWithGravity {
     }
 
 
+    public BallType getBalltype() {
+        return balltype;
+    }
+
+    public void setBalltype(BallType balltype) {
+        this.balltype = balltype;
+    }
 }

@@ -7,7 +7,6 @@ import pedro.ieslaencanta.com.busterbros.basic.ElementWithGravity;
 
 public class Hook extends ElementResizable {
      boolean disparo= false;
-     public static int Total_Incrementado;
     public Hook (){
         super();
     }
@@ -16,7 +15,6 @@ public class Hook extends ElementResizable {
 
     }
     public double shoot(){
-    Total_Incrementado= (int) (Total_Incrementado+ih+2);
         return ih+2;
 
     }

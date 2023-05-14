@@ -13,6 +13,7 @@ import javafx.scene.input.KeyCode;
 
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import javafx.util.Pair;
 import pedro.ieslaencanta.com.busterbros.basic.*;
 import pedro.ieslaencanta.com.busterbros.basic.interfaces.IMovable;
@@ -45,6 +46,10 @@ public class Board implements IKeyListener {
     private Level levels[];
     private int actual_level = -1;
     private MediaPlayer backgroundsound;
+    private MediaPlayer ballsound;
+    private MediaPlayer explotesound;
+    private MediaPlayer shootsound;
+
     private Element[] elements;
     private ElementWithGravity jugador;
     private ElementWithGravity ball;
@@ -53,7 +58,9 @@ public class Board implements IKeyListener {
     private Crossbow crossbow;
     private Hook hook;
     private boolean si=false;
-    private int vidas=1;
+    private int vidas=3;
+    private boolean exploto;
+
     public Board(Dimension2D original) {
         this.gc = null;
         this.game_zone = new Rectangle2D(8, 8, 368, 192);
@@ -222,86 +229,78 @@ public class Board implements IKeyListener {
                 e.setVy(-Math.abs(e.getVy()));
                 e.setPosition(e.getRectangle().getMinX(),
                         this.game_zone.getMaxY() - e.getRectangle().getHeight());
+                ballsound = Resources.getInstance().getSound("pared");
+                ballsound.seek(Duration.ZERO);
+                ballsound.play();
                 break;
             case TOP:
                 e.setVy(Math.abs(e.getVy()));
+                ballsound = Resources.getInstance().getSound("pared");
+                ballsound.seek(Duration.ZERO);
+                ballsound.play();
                 break;
             case LEFT:
                 e.setVx(Math.abs(e.getVx()));
+                ballsound = Resources.getInstance().getSound("pared");
+                ballsound.seek(Duration.ZERO);
+                ballsound.play();
                 break;
             case RIGHT:
                 e.setVx(-Math.abs(e.getVx()));
+                ballsound = Resources.getInstance().getSound("pared");
+                ballsound.seek(Duration.ZERO);
+                ballsound.play();
                 break;
         }
     }
 
     private void update() {
-       /* for (int i= 0; i<this.elements.length;i++){
-            if(this.elements[i] != null && this.elements[i] instanceof IMovable){
-                ((ElementMovable)this.elements[i]).move(2,0);
-            }
-        }*/
-       /* jugador.move();
-        IMovable.BorderColision b = this.jugador.isInBorder(game_zone);
-        switch(b){
-            case DOWN:
-                this.jugador.setVy(-Math.abs(this.jugador.getVy()));
-                break;
-            case TOP:
-                this.jugador.setVy(Math.abs(this.jugador.getVy()));
-                break;
-            case LEFT:
-                this.jugador.setVx(Math.abs(this.jugador.getVx()));
-                break;
-            case RIGHT:
-                this.jugador.setVx(-Math.abs(this.jugador.getVx()));
-                break;
-        }
-         ball.move();
-        IMovable.BorderColision c = this.ball.isInBorder(game_zone);
-        switch(c){
-            case DOWN:
-                this.ball.setVy(-Math.abs(this.ball.getVy()));
-                break;
-            case TOP:
-                this.ball.setVy(Math.abs(this.ball.getVy()));
-                break;
-            case LEFT:
-                this.ball.setVx(Math.abs(this.ball.getVx()));
-                break;
-            case RIGHT:
-                this.ball.setVx(-Math.abs(this.ball.getVx()));
-                break;
-        }*/
+
         for (int i = 0; i < this.balls.getSize(); i++) {
             if (this.balls.getBall(i) != null) {
                 this.balls.getBall(i).move();
                 this.evalBorder(this.balls.getBall(i));
                 this.detectColisionWithBricks();
-                System.out.println(this.hook.getCenterY());
-                if (this.hook.getRectangle().intersects(this.balls.getBall(i).getRectangle())) {
+                if ( this.exploto==false && this.hook.getRectangle().intersects(this.balls.getBall(i).getRectangle())) {
+                    explotesound = Resources.getInstance().getSound("romper");
+                    explotesound.seek(Duration.ZERO);
+                    explotesound.play();
                     Ball[] b = this.balls.getBall(i).explotar();
                     this.balls.removeBall(this.balls.getBall(i));
                     this.balls.addBall(b[0]);
                     this.balls.addBall(b[1]);
 
                 }
-                if (this.jugador.getRectangle().intersects(this.balls.getBall(i).getRectangle())) {
+                if ( this.hook.getRectangle().intersects(this.balls.getBall(i).getRectangle())
+                        && (this.balls.getBall(i).getBalltype() == BallType.BIG)) {
+                    System.out.println(this.balls.getBall(i).getBalltype());
+                    this.balls.removeBall(this.balls.getBall(i));
+                    this.exploto=true;
+                }
+
+                if ( this.balls.getBall(i)!=null
+                        && this.jugador.getRectangle().intersects(this.balls.getBall(i).getRectangle())) {
+                    this.balls.getBall(i).setPosition(20, 20);
+                    this.jugador.setPosition(this.game_zone.getMaxX()/2, this.game_zone.getMaxY()-32);
                     vidas--;
+                    System.out.println("Vida Total: "+vidas);
                     if(vidas<1){
                         PararJuego();
+                        System.out.println("GAME OVER");
                     }
                 }
-                if (si == true) {
-                    this.hook.resizeHeigth();
-                    if (this.hook.getHeight() <= 8) {
-                        this.hook.pararDisparo();
-                    }
-                }
+
                 }
             }
+        if (si == true) {
+            this.hook.resizeHeigth();
+            if (this.hook.getHeight() <= 8) {
+                this.hook.pararDisparo();
+            }
+        }
         this.crossbow.update();
         }
+
 
 
 
@@ -347,6 +346,7 @@ public class Board implements IKeyListener {
         for (int i = 0; i < this.balls.getSize(); i++) {
             if (this.balls.getBall(i) != null)
                 this.balls.getBall(i).setPosition(-10000,-100000);
+
         }
     }
 
@@ -408,6 +408,7 @@ public class Board implements IKeyListener {
                     this.levels[actual_level].getX(), this.levels[actual_level].getYBackground(), this.original_size.getWidth(), this.original_size.getHeight(),
                     0, 0, this.original_size.getWidth() * Game.SCALE, this.original_size.getHeight() * Game.SCALE);
         }
+
     }
 
     /**
@@ -432,9 +433,14 @@ public class Board implements IKeyListener {
             case DOWN:
                 this.down_press = true;
                 break;
-
+            case G:
+                shootsound = Resources.getInstance().getSound("disparo");
+                shootsound.seek(Duration.ZERO);
+                shootsound.play();
+                break;
         }
-    }
+        }
+
 
 
     @Override
@@ -484,7 +490,6 @@ public class Board implements IKeyListener {
                 this.hook.shoot();
 
                 this.hook.setPosition(this.jugador.getCenter().getX(),this.jugador.getCenter().getY()+10);
-                System.out.println(this.hook.Total_Incrementado+ this.hook.getHeight());
 
                 si=true;
                 break;
